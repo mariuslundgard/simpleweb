@@ -1,0 +1,28 @@
+.ml-nav {
+  /* background: #eee; */
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0;
+  list-style-type: none;
+
+  & li {
+    display: inline-block;
+  }
+
+  & a {
+    display: block;
+    text-decoration: none;
+    padding: 15px;
+    opacity: 0.5;
+    transition: opacity 200ms;
+    will-change: opacity;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media screen and (min-width: 900px) {
+    max-width: 675px;
+  }
+}

@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+  web:
+    image: mariuslundgard/simpleweb:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
+    environment:
+      FEATURE_LIVE: "off"
+      LETSENCRYPT_EMAIL: studio@mariuslundgard.com
+      LETSENCRYPT_HOST: mariuslundgard.com,www.mariuslundgard.com
+      REDIS_URL: redis://redis:6379
+      VIRTUAL_HOST: mariuslundgard.com,www.mariuslundgard.com
+    volumes:
+      - ./secrets:/usr/src/app/secrets
+    links:
+      - redis
+    depends_on:
+      - redis
+      - proxy
+
+  redis:
+    image: redis:3
+
+  proxy:
+    image: jwilder/nginx-proxy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /root/certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: ""
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    volumes:
+      - /root/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - proxy

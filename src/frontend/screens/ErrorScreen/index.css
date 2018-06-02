@@ -1,0 +1,33 @@
+.ml-error-screen {
+  text-align: center;
+  color: #f44;
+  background: #fcc;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.ml-error-screen__title {
+  font-size: 200%;
+  margin: 0 0 0.5;
+  line-height: 1;
+}
+
+.ml-error-screen__description {
+}
+
+.ml-error-screen__button-wrapper {
+  padding: 3em 0;
+
+  & a {
+    display: inline-block;
+    background: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+}
