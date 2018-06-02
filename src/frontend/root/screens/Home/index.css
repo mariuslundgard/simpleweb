@@ -1,0 +1,52 @@
+.ml-home {
+  padding: 0.5em 0 2em;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
+.ml-home__entry-list {
+  max-width: 540px;
+  margin: 0 auto;
+
+  & h2 {
+    color: #111;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 400;
+    /* text-transform: uppercase; */
+    margin: 1em 15px 0.5em;
+    line-height: 1;
+  }
+
+  & ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  & ol li a {
+    display: block;
+    padding: 0.25em 15px;
+    margin: 0.25em 0;
+    text-decoration: none;
+
+    &:hover {
+      /* text-decoration: underline; */
+    }
+  }
+}
+
+.ml-home__entry-title {
+  font-size: 150%;
+  font-weight: 700;
+  line-height: 1.1;
+
+  @nest a:hover & {
+    text-decoration: underline;
+  }
+}
+
+.ml-home__entry-published {
+  font-size: 14px;
+  line-height: 1.5;
+}

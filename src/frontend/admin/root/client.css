@@ -1,0 +1,7 @@
+@import './base.css';
+
+@import './lib/components/Header/index.css';
+
+@import './screens/Features/index.css';
+@import './screens/Home/index.css';
+@import './screens/Tasks/index.css';

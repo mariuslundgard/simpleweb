@@ -1,0 +1,24 @@
+sudo: required
+language: generic
+services:
+  - docker
+addons:
+  ssh_known_hosts: mariuslundgard.com
+before_install:
+  - openssl aes-256-cbc -k "$SSH_PRIVATE_KEY" -in .ci/travis/travis_rsa.enc -out ~/.ssh/travis_rsa -d
+  - chmod 600 ~/.ssh/travis_rsa
+script:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - npm run docker-build
+  - npm run docker-push
+before_deploy:
+  - eval "$(ssh-agent -s)"
+  - ssh-add ~/.ssh/travis_rsa
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: scp .ci/docker-compose.yml travis@mariuslundgard.com:docker-compose.yml && ssh travis@mariuslundgard.com 'bash -s' < scripts/remote-deploy.sh
+  on:
+    branch: master
+notifications:
+  slack: mariuslundgard:g18KTkxxIjqPChSvpvkkkiVS

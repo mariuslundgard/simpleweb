@@ -1,0 +1,30 @@
+.ml-admin-nav {
+  /* background: #eee; */
+  font-size: 0.778em;
+
+  & ul {
+    margin: 0;
+    padding: 0 5px;
+    list-style: none;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  & li {
+    display: inline-block;
+  }
+
+  & a {
+  }
+}
+
+.ml-admin-nav__item {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #999;
+}
+
+.ml-admin-nav__item--active {
+  color: #222;
+}

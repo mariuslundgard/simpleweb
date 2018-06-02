@@ -1,0 +1,9 @@
+.env
+.git
+.gitignore
+dist
+node_modules
+scripts/dev
+scripts/simulate-notifications.js
+scripts/*.sh
+secrets

@@ -1,0 +1,20 @@
+.ml-maintenance {
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.ml-maintenance__title {
+  font-size: 200%;
+  margin: 0 0 0.5em;
+  line-height: 1;
+}
+
+.ml-maintenance__description {
+  padding: 0 0 2em;
+}

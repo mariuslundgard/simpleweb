@@ -1,0 +1,17 @@
+.ml-admin-home {
+  padding: 15px;
+  max-width: 540px;
+  margin: 0 auto;
+
+  & h1 {
+    font: inherit;
+    margin: 0;
+    padding: 15px 0;
+  }
+
+  & h2 {
+    font: inherit;
+    font-size: 14px;
+    margin: 2em 0 0;
+  }
+}

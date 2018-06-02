@@ -1,0 +1,42 @@
+.ml-toggle-btn {
+  background: #eee;
+  -webkit-appearance: none;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  width: 50px;
+  height: 30px;
+  /* padding: 3px; */
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 99px;
+  outline: none;
+  vertical-align: top;
+  cursor: pointer;
+  border: 2px solid #eee;
+  transition: border-color 100ms, background 100ms;
+
+  & > span {
+    margin-top: -1px;
+    margin-left: 0;
+    display: block;
+    width: 26px;
+    height: 26px;
+    background: #fff;
+    font-size: 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    transition: transform 100ms;
+    will-change: transform;
+  }
+}
+
+.ml-toggle-btn--on {
+  background: #4cd964;
+  border-color: #4cd964;
+
+  & > span {
+    transform: translate3d(20px, 0, 0);
+    /* margin-left: 40px; */
+  }
+}
