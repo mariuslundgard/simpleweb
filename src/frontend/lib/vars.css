@@ -1,0 +1,19 @@
+:root {
+  /* Grays */
+  --very-light-gray: #dfe1e6;
+  --light-gray: #abb0bc;
+  --gray: #6c758a;
+  --dark-gray: #45516b;
+  --very-dark-gray: #273553;
+
+  /* Tints */
+  --green: #9bee91;
+  --cyan: #76d5ee;
+  --blue: #76adfb;
+  --purple: #c196f5;
+  --pink: #f984b2;
+  --red: #f4848a;
+  --strong-orange: #f59e6f;
+  --orange: #f9c462;
+  --light-orange: #f7ea75;
+}

@@ -1,0 +1,16 @@
+@import './lib/vars.css';
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  background: var(--very-dark-gray);
+  color: var(--purple);
+  margin: 0;
+}
+
+#root {
+  position: relative;
+}

@@ -1,0 +1,6 @@
+# web
+
+## Prerequisites
+
+* Docker
+* Redis
