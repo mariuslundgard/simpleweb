@@ -2,7 +2,11 @@
 
 import camelCase from 'lodash.camelcase'
 
-export function parseGoogleHeaders (headers: any) {
+type Headers = {
+  [key: string]: string
+}
+
+export function parseGoogleHeaders (headers: Headers) {
   const prefix = 'x-goog-'
 
   const msg = Object.keys(headers).reduce((curr, key) => {

@@ -38,15 +38,23 @@ module.exports = {
     sourcemap: true
   },
   external: [
+    'body-parser',
     'date-fns',
     'express',
     'express-graphql',
     'graphql',
+    'http-auth',
     'lodash.camelcase',
-    'request'
+    'redis',
+    'request',
+    'superagent',
+    'util'
   ],
   plugins: [
     resolve({
+      customResolveOptions: {
+        paths: process.env.NODE_PATH.split(/[;:]/)
+      },
       jsnext: true,
       main: true,
       browser: true

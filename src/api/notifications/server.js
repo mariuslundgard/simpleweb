@@ -3,10 +3,11 @@
 import express from 'express'
 import { parseGoogleHeaders } from './helpers'
 
+import type { DbClient } from 'db'
 import type { $Request, $Response } from 'express'
-import type { Config } from '../../types'
+import type { Config } from 'types'
 
-function create (config: Config) {
+function create (config: Config, db: DbClient) {
   const { logger } = config
   const server = express()
 
@@ -16,14 +17,11 @@ function create (config: Config) {
 
       const payload = parseGoogleHeaders(req.headers)
 
-      await config.queue.producer.rpush(
-        'tasks',
-        JSON.stringify({ type: 'googleNotification', payload })
-      )
+      await db.tasks.create('googleNotification', payload)
 
       res.json({ message: 'ok' })
     } catch (err) {
-      console.error(err.stack)
+      logger.error(err.stack)
       res.status(500)
       res.json({
         message: err.message

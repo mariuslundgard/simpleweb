@@ -1,0 +1,13 @@
+html {
+  font: 18px/24px -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  color: #222;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}

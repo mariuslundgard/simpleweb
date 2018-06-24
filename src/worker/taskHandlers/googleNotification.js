@@ -1,52 +1,62 @@
 // @flow
 
 import qs from 'qs'
-import gapi from './lib/gapi'
+import gapi from 'gapi'
 import { fetchToken } from './lib/helpers'
 
-import type { Config } from '../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
-async function handleChangedTask (config: Config, payload) {
+async function handleChangedTask (
+  config: Config,
+  redis: Client,
+  db: any,
+  task: any
+) {
   const { logger } = config
 
   logger.info('Task: googleNotification.change')
 
-  const query = qs.parse(payload.resourceUri.split('?')[1])
+  const query = qs.parse(task.resourceUri.split('?')[1])
   const token = await fetchToken(config)
   const changes = await gapi.drive.changes.list({ ...query, token })
 
   await Promise.all(
     changes.changes.map(change => {
       if (change.removed) {
-        return config.queue.producer.rpush(
-          'tasks',
-          JSON.stringify({ type: 'removePost', id: change.fileId })
-        )
+        return db.tasks.create('removePost', { id: change.fileId })
       } else {
-        return config.queue.producer.rpush(
-          'tasks',
-          JSON.stringify({ type: 'fetchPost', id: change.fileId })
-        )
+        return db.tasks.create('fetchPost', { id: change.fileId })
       }
     })
   )
 }
 
-async function handleSyncTask (config, payload) {
+async function handleSyncTask (
+  config: Config,
+  redis: Client,
+  db: any,
+  task: any
+) {
   const { logger } = config
 
   logger.info('Task: googleNotification.sync')
 }
 
-async function googleNotification (config: Config, task: any) {
+async function googleNotification (
+  config: Config,
+  redis: Client,
+  db: any,
+  task: any
+) {
   const { payload } = task
 
   switch (payload.resourceState) {
     case 'change':
-      await handleChangedTask(config, payload)
+      await handleChangedTask(config, redis, db, payload)
       break
     case 'sync':
-      await handleSyncTask(config, payload)
+      await handleSyncTask(config, redis, db, payload)
       break
     default:
       throw new Error(`Unknown resource state: ${payload.resourceState}`)

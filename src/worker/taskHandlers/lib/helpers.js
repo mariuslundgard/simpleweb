@@ -1,9 +1,10 @@
 // @flow
 
-import gapi from './gapi'
-import gdocAml from './gdoc-aml'
+import gapi from 'gapi'
+import gdocAml from 'gdoc-aml'
 
-import type { Config } from '../../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
 export function sanitizeId (str: string) {
   return str
@@ -13,8 +14,8 @@ export function sanitizeId (str: string) {
     .replace(/\s/g, '-')
 }
 
-export async function fetchToken (config: Config) {
-  const rawToken = await config.cache.get('token')
+export async function fetchToken (config: Config, redis: Client) {
+  const rawToken = await redis.cache.get('token')
 
   if (rawToken) {
     return JSON.parse(rawToken)
@@ -25,13 +26,13 @@ export async function fetchToken (config: Config) {
     scopes: ['https://www.googleapis.com/auth/drive']
   })
 
-  await config.cache.set('token', JSON.stringify(token))
-  await config.cache.expire('token', token.expires_in - 60)
+  await redis.cache.set('token', JSON.stringify(token))
+  await redis.cache.expire('token', token.expires_in - 60)
 
   return token
 }
 
-export async function fetchPost (config: Config, fileId: string) {
+export async function fetchPost (config: Config, redis: Client, fileId: string) {
   const token = await fetchToken(config)
 
   const file = await gapi.drive.files.get({
@@ -51,8 +52,6 @@ export async function fetchPost (config: Config, fileId: string) {
   })
 
   const doc = await gdocAml.parse(content)
-
-  // console.log(doc.image)
 
   let image
   if (doc.image && doc.image.id && doc.image.alt) {
@@ -80,8 +79,9 @@ export async function fetchPost (config: Config, fileId: string) {
   }
 }
 
-export async function removeFile (config: Config, id: string) {
-  const { cache, logger } = config
+export async function removeFile (config: Config, redis: Client, id: string) {
+  const { logger } = config
+  const { cache } = redis
 
   await cache.srem('post_ids', id)
   await cache.del(`posts:${id}`)
@@ -89,30 +89,30 @@ export async function removeFile (config: Config, id: string) {
   logger.info(`Post #${id} was removed`)
 }
 
-export async function updateFile (config: Config, id: string) {
+export async function updateFile (config: Config, redis: Client, id: string) {
   const { logger } = config
 
-  const post = await fetchPost(config, id)
+  const post = await fetchPost(config, redis, id)
 
   if (!post) {
     return null
   }
 
-  await config.cache.set(`posts:${id}`, JSON.stringify(post))
+  await redis.cache.set(`posts:${id}`, JSON.stringify(post))
 
   logger.info(`Post #${id} was updated`)
 }
 
-export async function addFile (config: Config, id: string) {
+export async function addFile (config: Config, redis: Client, id: string) {
   const { logger } = config
-  const post = await fetchPost(config, id)
+  const post = await fetchPost(config, redis, id)
 
   if (!post) {
     return null
   }
 
-  await config.cache.sadd('post_ids', id)
-  await config.cache.set(`posts:${id}`, JSON.stringify(post))
+  await redis.cache.sadd('post_ids', id)
+  await redis.cache.set(`posts:${id}`, JSON.stringify(post))
 
   logger.info(`Post #${id} was added`)
 }

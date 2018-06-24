@@ -4,5 +4,6 @@
 dist
 node_modules
 scripts/dev
-scripts/simulateGoogleMessage.js
+scripts/simulate-notifications.js
+scripts/*.sh
 secrets

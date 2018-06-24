@@ -1,0 +1,15 @@
+/* @import '../lib/vars.css'; */
+
+.ml-app {
+  /* padding: 15px; */
+  /* max-width: 540px; */
+  /* margin: 0 auto; */
+}
+
+.ml-app--is-server {
+  color: #999;
+}
+
+.ml-app--is-loading-screen {
+  color: #999;
+}

@@ -1,24 +1,27 @@
 // @flow
 
+import gapi from 'gapi'
 import uuid from 'uuid/v4'
-import gapi from './lib/gapi'
 import { fetchToken } from './lib/helpers'
 
-import type { Config } from '../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
-async function subscribe (config: Config) {
-  const { cache, logger } = config
+async function subscribe (config: Config, redis: Client, db: any) {
+  const { logger } = config
+  const { cache } = redis
 
   logger.info('Task: subscribe')
-
-  const { channelExpiration } = config.google
 
   const rawChannel = await cache.get('channel')
 
   if (rawChannel) {
-    logger.info('already subscribed to channel', JSON.parse(rawChannel))
-    return
+    throw new Error('Already subscribed')
   }
+
+  const { rootFolderId } = config.google
+
+  const { channelExpiration } = config.google
 
   const token = await fetchToken(config)
   const startPageToken = await gapi.drive.changes.getStartPageToken({
@@ -30,14 +33,14 @@ async function subscribe (config: Config) {
     token,
     id: uuid(),
     pageToken: startPageToken,
-    resourceId: config.google.rootFolderId,
+    resourceId: rootFolderId,
     expiration: new Date().getTime() + 1000 * channelExpiration
   })
 
   await cache.set('channel', JSON.stringify(channel))
   await cache.expire('channel', channelExpiration)
 
-  logger.info('subscribed to channel', channel)
+  logger.info('Subscribed to channel', channel)
 }
 
 export default subscribe

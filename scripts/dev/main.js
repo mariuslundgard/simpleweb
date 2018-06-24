@@ -11,74 +11,15 @@ require('babel-register')({
 
 const chokidar = require('chokidar')
 const express = require('express')
-const pino = require('pino')
-const redis = require('redis')
-const request = require('request')
 const rollup = require('rollup')
-const { promisify } = require('util')
-const postcss = require('./lib/postcss')
+const buildConfig = require('../../src/frontend/build.config')
 const clientConfig = require('../../.rollup/client.config')
+const postcss = require('../lib/postcss')
+const config = require('../config')
+
 const serverPath = path.resolve(sourcePath, 'server')
 
-const { BASE_URL, REDIS_URL } = process.env
-
 const clients = []
-
-function getFeatureEnv (key, defaultFlag = false) {
-  return process.env[`FEATURE_${key}`] === 'on' || defaultFlag
-}
-
-const apiClient = {
-  query: q => {
-    return new Promise((resolve, reject) => {
-      request.post(
-        {
-          url: `http://localhost:3000/api/graphql?query=${q}`
-        },
-        (err, res, text) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(JSON.parse(text))
-          }
-        }
-      )
-    })
-  }
-}
-
-const config = {
-  apiClient,
-  baseUrl: BASE_URL,
-  features: {
-    live: getFeatureEnv('LIVE')
-  },
-  graphiql: true,
-  google: {
-    credentials: require('../../secrets/google-service-account.json')
-  },
-  cache: (client => ({
-    get: promisify(client.get).bind(client),
-    expire: promisify(client.expire).bind(client),
-    set: promisify(client.set).bind(client),
-    del: promisify(client.del).bind(client),
-    hset: promisify(client.hset).bind(client),
-    sadd: promisify(client.sadd).bind(client),
-    srem: promisify(client.srem).bind(client),
-    smembers: promisify(client.smembers).bind(client)
-  }))(redis.createClient(REDIS_URL)),
-  manifest: {
-    'app.css': 'app.css',
-    'app.js': 'app-dev.js',
-    'app-down.css': 'app-down.css'
-  },
-  logger: pino({ name: 'main', prettyPrint: true }),
-  queue: {
-    producer: (client => ({
-      rpush: promisify(client.rpush).bind(client)
-    }))(redis.createClient(REDIS_URL))
-  }
-}
 
 const port = 3000
 
@@ -87,7 +28,9 @@ const rollupWatcher = rollup.watch(clientConfig)
 rollupWatcher.on('event', evt => {
   switch (evt.code) {
     case 'FATAL':
-      config.pino.error(evt.error.stack)
+      if (evt && evt.error) {
+        config.logger.error(evt.error.stack)
+      }
       process.exit(1)
 
     default:
@@ -99,22 +42,15 @@ rollupWatcher.on('event', evt => {
 })
 
 function bundleCss () {
-  return Promise.all([
-    postcss.bundle({
-      clients,
-      from: path.resolve(sourcePath, 'frontend/client.css'),
-      to: path.resolve(__dirname, '../../dist/client/app.css')
-    }),
-    postcss.bundle({
-      clients,
-      from: path.resolve(sourcePath, 'frontend/client-down.css'),
-      to: path.resolve(__dirname, '../../dist/client/app-down.css')
-    })
-  ])
+  return Promise.all(
+    buildConfig.css.map(cssConfig => postcss.bundle(cssConfig))
+  )
 }
 
 bundleCss().catch(err => {
-  config.pino.error(`CSS ${err.stack}`)
+  if (err) {
+    config.logger.error(`CSS ${err.stack}`)
+  }
 })
 
 // Setup server-side watcher
@@ -129,7 +65,7 @@ watcher.on('ready', () => {
           })
         })
         .catch(err => {
-          config.pino.error(`CSS ${err.stack}`)
+          config.logger.error(`CSS ${err.stack}`)
         })
     } else {
       Object.keys(require.cache)
@@ -165,8 +101,16 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500)
-  res.send(`<h1>Something went wrong!</h1><pre>${err.stack}</pre>`)
+  res.status(err.status || 500)
+  res.send(
+    [
+      `<h1>Something went wrong!</h1>`,
+      `<pre>${err.stack}</pre>`,
+      err.errors && `<pre>${JSON.stringify(err.errors, null, 2)}</pre>`
+    ]
+      .filter(Boolean)
+      .join('')
+  )
   next()
 })
 
@@ -178,8 +122,8 @@ app.listen(port, err => {
     config.logger.error(err)
     process.exit(1)
   } else {
-    console.log('┌──────────────────────────────────────────────────┐')
-    console.log(`│ The server is listening at http://localhost:${port} │`)
-    console.log('└──────────────────────────────────────────────────┘\n')
+    console.log('┌────────────────────────────────────────────────┐')
+    console.log(`│ The server is listening at ${config.baseUrl} │`)
+    console.log('└────────────────────────────────────────────────┘\n')
   }
 })

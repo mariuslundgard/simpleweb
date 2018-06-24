@@ -2,19 +2,20 @@
 
 import { updateFile, addFile } from './lib/helpers'
 
-import type { Config } from '../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
-async function fetchPost (config: Config, task: any) {
-  const { cache, logger } = config
+async function fetchPost (config: Config, redis: Client, db: any, task: any) {
+  const { cache, logger } = redis
 
-  logger.info(`Task: fetchPost #${task.id}`)
+  logger.info(`Task: fetchPost #${task.payload.id}`)
 
   const postIds = await cache.smembers('post_ids')
 
-  if (postIds && postIds.indexOf(task.id) > -1) {
-    updateFile(config, task.id)
+  if (postIds && postIds.indexOf(task.payload.id) > -1) {
+    await updateFile(config, redis, task.payload.id)
   } else {
-    addFile(config, task.id)
+    await addFile(config, redis, task.payload.id)
   }
 }
 

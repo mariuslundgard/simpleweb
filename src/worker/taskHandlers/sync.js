@@ -1,12 +1,14 @@
 // @flow
 
-import gapi from './lib/gapi'
+import gapi from 'gapi'
 import { fetchToken } from './lib/helpers'
 
-import type { Config } from '../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
-async function sync (config: Config) {
+async function sync (config: Config, redis: Client, db: any) {
   const { logger } = config
+  const { cache } = redis
 
   logger.info('Task: sync')
 
@@ -31,14 +33,11 @@ async function sync (config: Config) {
 
   const addedIds = childrenResource.files.map(file => file.id)
 
-  const postIds = await config.cache.smembers('post_ids')
+  const postIds = await cache.smembers('post_ids')
 
   await Promise.all(
     addedIds.map(id => {
-      return config.queue.producer.rpush(
-        'tasks',
-        JSON.stringify({ type: 'fetchPost', id })
-      )
+      return db.tasks.create('fetchPost', { id })
     })
   )
 
@@ -48,10 +47,7 @@ async function sync (config: Config) {
 
   await Promise.all(
     removedIds.map(id => {
-      return config.queue.producer.rpush(
-        'tasks',
-        JSON.stringify({ type: 'removePost', id })
-      )
+      return db.tasks.create('removePost', { id })
     })
   )
 }

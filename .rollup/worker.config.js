@@ -44,11 +44,16 @@ module.exports = {
     'html-entities',
     'htmlparser2',
     'jsonwebtoken',
+    'redis',
     'request',
-    'url'
+    'url',
+    'util'
   ],
   plugins: [
     resolve({
+      customResolveOptions: {
+        paths: process.env.NODE_PATH.split(/[;:]/)
+      },
       jsnext: true,
       main: true,
       browser: true

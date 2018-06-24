@@ -2,31 +2,38 @@
 
 import express from 'express'
 
+import type { DbClient } from 'db'
 import type { $Request, $Response } from 'express'
-import type { Config } from '../../types'
+import type { Config } from 'types'
 
-function create (config: Config) {
-  const { queue } = config
+function create (config: Config, db: DbClient) {
   const server = express()
 
-  async function queueTask (task: any) {
-    const result = await queue.producer.rpush('tasks', JSON.stringify(task))
-    return result
-  }
-
   server.get('/sync', async (req: $Request, res: $Response) => {
-    await queueTask({ type: 'sync' })
-    res.json({ message: 'ok' })
+    try {
+      const task = await db.tasks.create('sync')
+      res.json(task)
+    } catch (err) {
+      res.send(err.stack)
+    }
   })
 
   server.get('/subscribe', async (req: $Request, res: $Response) => {
-    await queueTask({ type: 'subscribe' })
-    res.json({ message: 'ok' })
+    try {
+      const task = await db.tasks.create('subscribe')
+      res.json(task)
+    } catch (err) {
+      res.send(err.stack)
+    }
   })
 
   server.get('/unsubscribe', async (req: $Request, res: $Response) => {
-    await queueTask({ type: 'unsubscribe' })
-    res.json({ message: 'ok' })
+    try {
+      const task = await db.tasks.create('unsubscribe')
+      res.json(task)
+    } catch (err) {
+      res.send(err.stack)
+    }
   })
 
   return server

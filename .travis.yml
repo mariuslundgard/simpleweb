@@ -17,7 +17,7 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  script: scp .ci/docker-compose.yml travis@mariuslundgard.com:docker-compose.yml && ssh travis@mariuslundgard.com 'bash -s' < scripts/remote_deploy.sh
+  script: scp .ci/docker-compose.yml travis@mariuslundgard.com:docker-compose.yml && ssh travis@mariuslundgard.com 'bash -s' < scripts/remote-deploy.sh
   on:
     branch: master
 notifications:

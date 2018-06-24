@@ -1,0 +1,71 @@
+.ml-task {
+  -webkit-appearance: none;
+  font-size: 14px;
+  margin: 10px 0;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+
+  & > summary {
+    display: flex;
+    flex-wrap: wrap;
+    outline: none;
+    cursor: pointer;
+  }
+
+  & > summary::-webkit-details-marker {
+    width: 10px;
+    padding: 0;
+    margin: 22px 0 0 15px;
+    height: 10px;
+  }
+
+  & > div {
+    background: #222;
+    color: #fff;
+    padding: 15px;
+    overflow: auto;
+  }
+}
+
+.ml-task--failed {
+  background: #f00;
+  color: #fff;
+}
+
+.ml-task--completed {
+  background: #090;
+  color: #fff;
+}
+
+.ml-task--started {
+  background: #cc0;
+  color: #fff;
+}
+
+.ml-task__type {
+  flex: 1 0 calc(30% - 20px);
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.ml-task__time {
+  flex: 1 0 60%;
+  padding: 15px;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+.ml-task__payload {
+  margin: 0;
+  font-family: Menlo;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.ml-task__error {
+  margin: 0;
+  font-family: Menlo;
+  font-size: 14px;
+  line-height: 20px;
+}

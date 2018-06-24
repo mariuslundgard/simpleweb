@@ -1,9 +1,0 @@
-@import './base.css';
-@import './core.css';
-
-@import './components/ContentItem/index.css';
-@import './components/Nav/index.css';
-@import './components/Footer/index.css';
-
-@import './screens/Article.css';
-@import './screens/ErrorScreen/index.css';

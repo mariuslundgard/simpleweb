@@ -1,20 +1,21 @@
 // @flow
 
-import gapi from './lib/gapi'
+import gapi from 'gapi'
 import { fetchToken } from './lib/helpers'
 
-import type { Config } from '../../types'
+import type { Config } from 'types'
+import type { Client } from 'redis-client'
 
-async function unsubscribe (config: Config) {
-  const { cache, logger } = config
+async function unsubscribe (config: Config, redis: Client, db: any) {
+  const { logger } = config
+  const { cache } = redis
 
   logger.info('Task: unsubscribe')
 
   const rawChannel = await cache.get('channel')
 
   if (!rawChannel) {
-    logger.info('Not subscribed')
-    return
+    throw new Error('Not subsbcribed')
   }
 
   const channel = JSON.parse(rawChannel)

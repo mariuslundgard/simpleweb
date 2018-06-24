@@ -1,31 +1,17 @@
 // @flow
 
 import graphqlHTTP from 'express-graphql'
-import schema from './schema'
-import resolvers from './resolvers'
+import rootValue from 'graphql-client/rootValue'
+import schema from 'graphql-client/schema'
 
-import type { Config } from '../../types'
+import type { DbClient } from 'db'
+import type { Config } from 'types'
 
-const rootValue = {
-  channel: (params, context, info) => {
-    return context.channels.findOne(params, context, info.fieldNodes[0])
-  },
-  modifiedTime: (params, context, info) => {
-    return context.modifiedTime.findOne(params, context, info.fieldNodes[0])
-  },
-  post: (params, context, info) => {
-    return context.posts.findOne(params, context, info.fieldNodes[0])
-  },
-  posts: (params, context, info) => {
-    return context.posts.findAll(params, context, info.fieldNodes[0])
-  }
-}
-
-function create (config: Config) {
-  const { cache, graphiql } = config
+function create (config: Config, db: DbClient) {
+  const { graphiql } = config
 
   return graphqlHTTP(() => ({
-    context: resolvers.create({ cache }),
+    context: db,
     graphiql,
     rootValue,
     schema
